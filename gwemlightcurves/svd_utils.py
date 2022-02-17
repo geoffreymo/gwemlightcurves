@@ -53,52 +53,52 @@ except:
 #from george import kernels
 
 def calc_svd_lbol(tini,tmax,dt, n_coeff = 100, model = "BaKa2016",
-                  gptype="sklearn"):
+                  gptype="sklearn", datadir='../output/', **kwargs):
 
     print("Calculating SVD model of bolometric luminosity...")
 
-    if model == "BaKa2016":    
-        fileDir = "../output/barnes_kilonova_spectra"
+    if model == "BaKa2016":
+        fileDir = datadir + "barnes_kilonova_spectra"
     elif model == "Ka2017":
-        fileDir = "../output/kasen_kilonova_grid"
+        fileDir = datadir + "kasen_kilonova_grid"
     elif model == "RoFe2017":
-        fileDir = "../output/macronovae-rosswog_wind"
+        fileDir = datadir + "macronovae-rosswog_wind"
     elif model == "Bu2019":
-        fileDir = "../output/bulla_1D"
-        fileDir = "../output/bulla_1D_phi0"
-        fileDir = "../output/bulla_1D_phi90"
+        fileDir = datadir + "bulla_1D"
+        fileDir = datadir + "bulla_1D_phi0"
+        fileDir = datadir + "bulla_1D_phi90"
     elif model == "Bu2019inc":
-        fileDir = "../output/bulla_2D"
+        fileDir = datadir + "bulla_2D"
     elif model == "Bu2019lf":
-        fileDir = "../output/bulla_2Component_lfree"
+        fileDir = datadir + "bulla_2Component_lfree"
     elif model == "Bu2019lr":
-        fileDir = "../output/bulla_2Component_lrich"
+        fileDir = datadir + "bulla_2Component_lrich"
     elif model == "Bu2019lm":
-        fileDir = "../output/bulla_2Component_lmid"
+        fileDir = datadir + "bulla_2Component_lmid"
     elif model == "Bu2019lw":
-        fileDir = "../output/bulla_2Component_lmid_0p005"
+        fileDir = datadir + "bulla_2Component_lmid_0p005"
     elif model == "Bu2019bc":
-        fileDir = "../output/bulla_blue_cone"
+        fileDir = datadir + "bulla_blue_cone"
     elif model == "Bu2019re":
-        fileDir = "../output/bulla_red_ellipse"
+        fileDir = datadir + "bulla_red_ellipse"
     elif model == "Bu2019op":
-        fileDir = "../output/bulla_opacity"
+        fileDir = datadir + "bulla_opacity"
     elif model == "Bu2019ops":
-        fileDir = "../output/bulla_opacity_slim"
+        fileDir = datadir + "bulla_opacity_slim"
     elif model == "Bu2019rp":
-        fileDir = "../output/bulla_reprocess"
+        fileDir = datadir + "bulla_reprocess"
     elif model == "Bu2019rps":
-        fileDir = "../output/bulla_reprocess_slim"
+        fileDir = datadir + "bulla_reprocess_slim"
     elif model == "Bu2019rpd":
-        fileDir = "../output/bulla_reprocess_decimated"
+        fileDir = datadir + "bulla_reprocess_decimated"
     elif model == "Bu2019nsbh":
-        fileDir = "../output/bulla_2Component_lnsbh"
+        fileDir = datadir + "bulla_2Component_lnsbh"
     elif model == "Bu2021ka":
-        fileDir = "../output/bulla_2Comp_kappas"
+        fileDir = datadir + "bulla_2Comp_kappas"
     elif model == "Wo2020dyn":
-        fileDir = "../output/bulla_rosswog_dynamical"
+        fileDir = datadir + "bulla_rosswog_dynamical"
     elif model == "Wo2020dw":
-        fileDir = "../output/bulla_rosswog_wind"
+        fileDir = datadir + "bulla_rosswog_wind"
 
 
     filenames = glob.glob('%s/*_Lbol.dat'%fileDir)
@@ -219,7 +219,7 @@ def calc_svd_lbol(tini,tmax,dt, n_coeff = 100, model = "BaKa2016",
             lbols[key]["theta"] = theta
 
         elif keySplit[0] == "nph1.0e+06":
- 
+
             mej0 = float(keySplit[1].replace("mej",""))
             phi0 = float(keySplit[2].replace("phi",""))
             theta = float(keySplit[3])
@@ -244,7 +244,7 @@ def calc_svd_lbol(tini,tmax,dt, n_coeff = 100, model = "BaKa2016",
             lbols[key]["theta"] = theta
 
         elif keySplit[0] == "RGAdyn":
-            
+
             mej = float(keySplit[2].replace("mej",""))
             a = float(keySplit[3].replace("a",""))
             sd = float(keySplit[4].replace("sd",""))
@@ -264,7 +264,7 @@ def calc_svd_lbol(tini,tmax,dt, n_coeff = 100, model = "BaKa2016",
             lbols[key]["mej"] = mej
             lbols[key]["rwind"] = rwind
             lbols[key]["theta"] = theta
-        
+
         ii = np.where(np.isfinite(lbols[key]["Lbol"]))[0]
         f = interp.interp1d(lbols[key]["tt"][ii], np.log10(lbols[key]["Lbol"][ii]), fill_value='extrapolate')
         lbolinterp = 10**f(tt)
@@ -281,7 +281,7 @@ def calc_svd_lbol(tini,tmax,dt, n_coeff = 100, model = "BaKa2016",
         elif model == "Ka2017":
             param_array.append([np.log10(lbols[key]["mej"]),np.log10(lbols[key]["vej"]),np.log10(lbols[key]["Xlan"])])
         elif model == "RoFe2017":
-            param_array.append([np.log10(lbols[key]["mej"]),lbols[key]["vej"],lbols[key]["Ye"]]) 
+            param_array.append([np.log10(lbols[key]["mej"]),lbols[key]["vej"],lbols[key]["Ye"]])
         elif model == "Bu2019":
             param_array.append([np.log10(lbols[key]["mej"]),np.log10(lbols[key]["T"])])
         elif model == "Bu2019inc":
@@ -313,12 +313,12 @@ def calc_svd_lbol(tini,tmax,dt, n_coeff = 100, model = "BaKa2016",
     param_array_postprocess = np.array(param_array)
     param_mins, param_maxs = np.min(param_array_postprocess,axis=0),np.max(param_array_postprocess,axis=0)
     for i in range(len(param_mins)):
-        param_array_postprocess[:,i] = (param_array_postprocess[:,i]-param_mins[i])/(param_maxs[i]-param_mins[i]) 
+        param_array_postprocess[:,i] = (param_array_postprocess[:,i]-param_mins[i])/(param_maxs[i]-param_mins[i])
 
     lbol_array_postprocess = np.array(lbol_array)
     mins,maxs = np.min(lbol_array_postprocess,axis=0),np.max(lbol_array_postprocess,axis=0)
     for i in range(len(mins)):
-        lbol_array_postprocess[:,i] = (lbol_array_postprocess[:,i]-mins[i])/(maxs[i]-mins[i])    
+        lbol_array_postprocess[:,i] = (lbol_array_postprocess[:,i]-mins[i])/(maxs[i]-mins[i])
     lbol_array_postprocess[np.isnan(lbol_array_postprocess)]=0.0
 
     UA, sA, VA = np.linalg.svd(lbol_array_postprocess, full_matrices=True)
@@ -490,52 +490,52 @@ def calc_svd_lbol(tini,tmax,dt, n_coeff = 100, model = "BaKa2016",
     return svd_model
 
 def calc_svd_mag(tini,tmax,dt, n_coeff = 100, model = "BaKa2016",
-                 gptype="sklearn"):
+                 gptype="sklearn", datadir="../output/", **kwargs):
 
     print("Calculating SVD model of lightcurve magnitudes...")
 
     if model == "BaKa2016":
-        fileDir = "../output/barnes_kilonova_spectra"
+        fileDir = datadir+"barnes_kilonova_spectra"
     elif model == "Ka2017":
-        fileDir = "../output/kasen_kilonova_grid"
+        fileDir = datadir+"kasen_kilonova_grid"
     elif model == "RoFe2017":
-        fileDir = "../output/macronovae-rosswog_wind"
+        fileDir = datadir+"macronovae-rosswog_wind"
     elif model == "Bu2019":
-        fileDir = "../output/bulla_1D"
-        fileDir = "../output/bulla_1D_phi0"
-        fileDir = "../output/bulla_1D_phi90"
+        fileDir = datadir+"bulla_1D"
+        fileDir = datadir+"bulla_1D_phi0"
+        fileDir = datadir+"bulla_1D_phi90"
     elif model == "Bu2019inc":
-        fileDir = "../output/bulla_2D"
+        fileDir = datadir+"bulla_2D"
     elif model == "Bu2019lf":
-        fileDir = "../output/bulla_2Component_lfree"
+        fileDir = datadir+"bulla_2Component_lfree"
     elif model == "Bu2019lr":
-        fileDir = "../output/bulla_2Component_lrich"
+        fileDir = datadir+"bulla_2Component_lrich"
     elif model == "Bu2019lm":
-        fileDir = "../output/bulla_2Component_lmid"
+        fileDir = datadir+"bulla_2Component_lmid"
     elif model == "Bu2019lw":
-        fileDir = "../output/bulla_2Component_lmid_0p005"
+        fileDir = datadir+"bulla_2Component_lmid_0p005"
     elif model == "Bu2019bc":
-        fileDir = "../output/bulla_blue_cone"
+        fileDir = datadir+"bulla_blue_cone"
     elif model == "Bu2019re":
-        fileDir = "../output/bulla_red_ellipse"
+        fileDir = datadir+"bulla_red_ellipse"
     elif model == "Bu2019op":
-        fileDir = "../output/bulla_opacity"
+        fileDir = datadir + "bulla_opacity"
     elif model == "Bu2019ops":
-        fileDir = "../output/bulla_opacity_slim"
+        fileDir = datadir + "bulla_opacity_slim"
     elif model == "Bu2019rp":
-        fileDir = "../output/bulla_reprocess"
+        fileDir = datadir + "bulla_reprocess"
     elif model == "Bu2019rps":
-        fileDir = "../output/bulla_reprocess_slim"
+        fileDir = datadir + "bulla_reprocess_slim"
     elif model == "Bu2019rpd":
-        fileDir = "../output/bulla_reprocess_decimated"
+        fileDir = datadir + "bulla_reprocess_decimated"
     elif model == "Bu2019nsbh":
-        fileDir = "../output/bulla_2Component_lnsbh"
+        fileDir = datadir + "bulla_2Component_lnsbh"
     elif model == "Bu2021ka":
-        fileDir = "../output/bulla_2Comp_kappas"
+        fileDir = datadir + "bulla_2Comp_kappas"
     elif model == "Wo2020dyn":
-        fileDir = "../output/bulla_rosswog_dynamical"
+        fileDir = datadir + "bulla_rosswog_dynamical"
     elif model == "Wo2020dw":
-        fileDir = "../output/bulla_rosswog_wind"
+        fileDir = datadir + "bulla_rosswog_wind"
 
     filenames_all = glob.glob('%s/*.dat'%fileDir)
     idxs = []
@@ -549,11 +549,11 @@ def calc_svd_mag(tini,tmax,dt, n_coeff = 100, model = "BaKa2016",
     magkeys = mags.keys()
 
     tt = np.arange(tini,tmax+dt,dt)
-    filters = ["u","g","r","i","z","y","J","H","K"]
+    filters = ["u","g","r","i","z","y","J","H","K","TESS"]
 
     for jj, key in enumerate(magkeys):
         print('Setup %s: %d/%d' % (key, jj, len(magkeys)+1))
-        
+
         keySplit = key.split("_")
         if keySplit[0] == "rpft":
             mej0 = float("0." + keySplit[1].replace("m",""))
@@ -571,12 +571,12 @@ def calc_svd_mag(tini,tmax,dt, n_coeff = 100, model = "BaKa2016",
                 if "Xlan1e" in keySplit[6]:
                     Xlan0 = 10**float(keySplit[6].replace("Xlan1e",""))
                 elif "Xlan1e" in keySplit[5]:
-                    Xlan0 = 10**float(keySplit[5].replace("Xlan1e","")) 
+                    Xlan0 = 10**float(keySplit[5].replace("Xlan1e",""))
 
             #if (mej0 == 0.05) and (vej0 == 0.2) and (Xlan0 == 1e-3):
             #    del mags[key]
             #    continue
- 
+
             mags[key]["mej"] = mej0
             mags[key]["vej"] = vej0
             mags[key]["Xlan"] = Xlan0
@@ -677,7 +677,7 @@ def calc_svd_mag(tini,tmax,dt, n_coeff = 100, model = "BaKa2016",
             #    T0 = float(keySplit[4].replace("T",""))
             #    theta = float(keySplit[5])
 
-            
+
             mej0 = float(keySplit[1].replace("mej",""))
             phi0 = float(keySplit[2].replace("phi",""))
             theta = float(keySplit[3])
@@ -740,7 +740,7 @@ def calc_svd_mag(tini,tmax,dt, n_coeff = 100, model = "BaKa2016",
         elif model == "Ka2017":
             param_array.append([np.log10(mags[key]["mej"]),np.log10(mags[key]["vej"]),np.log10(mags[key]["Xlan"])])
         elif model == "RoFe2017":
-            param_array.append([np.log10(mags[key]["mej"]),mags[key]["vej"],mags[key]["Ye"]])    
+            param_array.append([np.log10(mags[key]["mej"]),mags[key]["vej"],mags[key]["Ye"]])
         elif model == "Bu2019":
             param_array.append([np.log10(mags[key]["mej"]),np.log10(mags[key]["T"])])
         elif model == "Bu2019inc":
@@ -749,7 +749,7 @@ def calc_svd_mag(tini,tmax,dt, n_coeff = 100, model = "BaKa2016",
             param_array.append([np.log10(mags[key]["mej_dyn"]),np.log10(mags[key]["mej_wind"]),mags[key]["phi"],mags[key]["theta"]])
         elif model in ["Bu2021ka"]:
             param_array.append([np.log10(mags[key]["mej_dyn"]),np.log10(mags[key]["mej_wind"]),mags[key]["phi"],mags[key]["theta"],mags[key]["kappa"]])
-        
+
         elif model in ["Bu2019nsbh"]:
             param_array.append([np.log10(mags[key]["mej_dyn"]),np.log10(mags[key]["mej_wind"]),mags[key]["theta"]])
         elif model in ["Bu2019lw"]:
@@ -770,7 +770,6 @@ def calc_svd_mag(tini,tmax,dt, n_coeff = 100, model = "BaKa2016",
             param_array.append([np.log10(mags[key]["mej"]),mags[key]["a"],mags[key]["sd"],mags[key]["theta"]])
         elif model == "Wo2020dw":
             param_array.append([np.log10(mags[key]["mej"]),mags[key]["rwind"],mags[key]["theta"]])
-
     param_array_postprocess = np.array(param_array)
     param_mins, param_maxs = np.min(param_array_postprocess,axis=0),np.max(param_array_postprocess,axis=0)
     for i in range(len(param_mins)):
@@ -823,7 +822,7 @@ def calc_svd_mag(tini,tmax,dt, n_coeff = 100, model = "BaKa2016",
                 #                              copy_X_train=False)
                 #gp.fit(param_array_postprocess, cAmat[i,:])
                 #size_estimate = len(pickle.dumps(gp))
-            
+
         elif gptype == "gp_api":
             nd = 1
             # Construct hyperparamters
@@ -838,7 +837,7 @@ def calc_svd_mag(tini,tmax,dt, n_coeff = 100, model = "BaKa2016",
 
             # Add them together
             kernel = k1 #+ k2
-        
+
             for i in range(n_coeff):
                 # Fit the training data
                 gp = GaussianProcess.fit(param_array_postprocess, cAmat[i,:], kernel=kernel, train_err=None)
@@ -849,18 +848,18 @@ def calc_svd_mag(tini,tmax,dt, n_coeff = 100, model = "BaKa2016",
                 if gp.param_names is not None:
                     gp_dict["param_names"] = ",".join(gp.param_names)
                 else:
-                    gp_dict["param_names"] = None    
+                    gp_dict["param_names"] = None
 
                 # Save the kernel
                 gp_dict["kernel"] = gp.kernel.to_json()
-    
+
                 # Save basic attributes
                 gp_dict["sparse"] = gp.sparse
                 gp_dict["hypercube_rescale"] = gp.hypercube_rescale
-    
+
                 # Save any extra metadata
                 gp_dict["metadata"] = json.dumps(gp.metadata)
-    
+
                 # Save the training error
                 gp_dict["train_err"] = gp.train_err
 
@@ -874,7 +873,7 @@ def calc_svd_mag(tini,tmax,dt, n_coeff = 100, model = "BaKa2016",
                         assert False
 
                 gps.append(gp_dict)
-     
+
         elif gptype == "gpytorch":
             # initialize likelihood and model
             likelihood = gpytorch.likelihoods.GaussianLikelihood()
@@ -969,14 +968,15 @@ def calc_svd_mag(tini,tmax,dt, n_coeff = 100, model = "BaKa2016",
 
     return svd_model
 
-def calc_svd_color_model(tini,tmax,dt, n_coeff = 100, model = "a2.0"):
+def calc_svd_color_model(tini,tmax,dt, n_coeff = 100, model = "a2.0",
+                         datadir="../output/", **kwargs):
 
     print("Calculating SVD model of inclination colors...")
 
     if model in ["DZ2","gamA2","gamB2"]:
-        fileDir = "../output/wollaeger/%s" % model
+        fileDir = datadir + "wollaeger/%s" % model
     else:
-        fileDir = "../output/kasen_kilonova_2D/%s" % model
+        fileDir = datadir + "kasen_kilonova_2D/%s" % model
 
     filenames_all = glob.glob('%s/*.dat'%fileDir)
     idxs = []
@@ -990,7 +990,7 @@ def calc_svd_color_model(tini,tmax,dt, n_coeff = 100, model = "a2.0"):
     magkeys = mags.keys()
 
     tt = np.arange(tini,tmax+dt,dt)
-    filters = ["u","g","r","i","z","y","J","H","K"]
+    filters = ["u","g","r","i","z","y","J","H","K", "TESS"]
 
     for key in magkeys:
         keySplit = key.split("_")
@@ -1080,16 +1080,17 @@ def calc_svd_color_model(tini,tmax,dt, n_coeff = 100, model = "a2.0"):
     return svd_model
 
 
-def calc_svd_spectra(tini,tmax,dt,lambdaini,lambdamax,dlambda, n_coeff = 100, model = "BaKa2016"):
+def calc_svd_spectra(tini,tmax,dt,lambdaini,lambdamax,dlambda, n_coeff = 100,
+                     model = "BaKa2016", datadir="../output/", **kwargs):
 
     print("Calculating SVD model of lightcurve spectra...")
 
     if model == "BaKa2016":
-        fileDir = "../output/barnes_kilonova_spectra"
+        fileDir = datadir + "barnes_kilonova_spectra"
     elif model == "Ka2017":
-        fileDir = "../output/kasen_kilonova_grid"
+        fileDir = datadir + "kasen_kilonova_grid"
     elif model == "RoFe2017":
-        fileDir = "../output/macronovae-rosswog_wind"
+        fileDir = datadir + "macronovae-rosswog_wind"
 
     filenames = glob.glob('%s/*_spec.dat'%fileDir)
 
@@ -1212,7 +1213,7 @@ def calc_color(tini,tmax,dt,param_list,svd_mag_color_model=None, model = "a2.0")
     if svd_mag_color_model == None:
         svd_mag_color_model = calc_svd_color_mag(tini,tmax,dt,model=model)
 
-    filters = ["u","g","r","i","z","y","J","H","K"]
+    filters = ["u","g","r","i","z","y","J","H","K", "TESS"]
     mAB = np.zeros((9,len(tt)))
     for jj,filt in enumerate(filters):
         n_coeff = svd_mag_color_model[filt]["n_coeff"]
@@ -1263,11 +1264,11 @@ def calc_lc(tini,tmax,dt,param_list,svd_mag_model=None,svd_lbol_model=None,
     tt = np.arange(tini,tmax+dt,dt)
 
     if svd_mag_model == None:
-        svd_mag_model = calc_svd_mag(tini,tmax,dt,model=model) 
+        svd_mag_model = calc_svd_mag(tini,tmax,dt,model=model)
     if svd_lbol_model == None:
         svd_lbol_model = calc_svd_lbol(tini,tmax,dt,model=model)
 
-    filters = ["u","g","r","i","z","y","J","H","K"]
+    filters = ["u","g","r","i","z","y","J","H","K", "TESS"]
     mAB = np.zeros((9,len(tt)))
     for jj,filt in enumerate(filters):
         if n_coeff_lim is None:
@@ -1305,10 +1306,10 @@ def calc_lc(tini,tmax,dt,param_list,svd_mag_model=None,svd_lbol_model=None,
                     cAstd[i] = sigma2_pred
                 elif gptype == "gp_api":
                     y_pred = gp.mean(np.atleast_2d(param_list_postprocess))
-    
+
                     y_samples_test = gp.rvs(100, np.atleast_2d(param_list_postprocess), random_state=random_state)
-                    y_90_lo_test, y_90_hi_test = np.percentile(y_samples_test, [5, 95], axis=1)    
-            
+                    y_90_lo_test, y_90_hi_test = np.percentile(y_samples_test, [5, 95], axis=1)
+
                     cAproj[i] = y_pred
                     cAstd[i] = y_90_hi_test - y_90_lo_test
                 elif gptype == "gpytorch":
@@ -1316,27 +1317,27 @@ def calc_lc(tini,tmax,dt,param_list,svd_mag_model=None,svd_lbol_model=None,
                     model = ExactGPModel(torch.from_numpy(param_array_postprocess).float(),
                                          torch.from_numpy(cAmat[i,:]).float(), likelihood)
                     model.load_state_dict(gp)
-    
+
                     # Get into evaluation (predictive posterior) mode
                     model.eval()
                     likelihood.eval()
-    
+
                     f_preds = model(torch.from_numpy(np.atleast_2d(param_list_postprocess)).float())
                     y_preds = likelihood(model(torch.from_numpy(np.atleast_2d(param_list_postprocess)).float()))
                     f_mean = f_preds.mean
                     f_var = f_preds.variance
-                    f_covar = f_preds.covariance_matrix               
-    
+                    f_covar = f_preds.covariance_matrix
+
                     cAproj[i] = f_mean
                     cAstd[i] = f_var
 
         coverrors = np.dot(VA[:,:n_coeff],np.dot(np.power(np.diag(cAstd[:n_coeff]),2),VA[:,:n_coeff].T))
         errors = np.diag(coverrors)
-    
+
         mag_back = np.dot(VA[:,:n_coeff],cAproj)
         mag_back = mag_back*(maxs-mins)+mins
         #mag_back = scipy.signal.medfilt(mag_back,kernel_size=3)
-    
+
         ii = np.where(~np.isnan(mag_back))[0]
         if len(ii) < 2:
             maginterp = np.nan*np.ones(tt.shape)
@@ -1376,10 +1377,10 @@ def calc_lc(tini,tmax,dt,param_list,svd_mag_model=None,svd_lbol_model=None,
                 cAproj[i] = y_pred
             elif gptype == "gp_api":
                 y_pred = gp.mean(np.atleast_2d(param_list_postprocess))
-    
+
                 y_samples_test = gp.rvs(100, np.atleast_2d(param_list_postprocess), random_state=random_state)
                 y_90_lo_test, y_90_hi_test = np.percentile(y_samples_test, [5, 95], axis=1)
-    
+
                 cAproj[i] = y_pred
                 cAstd[i] = y_90_hi_test - y_90_lo_test
             elif gptype == "gpytorch":
@@ -1387,17 +1388,17 @@ def calc_lc(tini,tmax,dt,param_list,svd_mag_model=None,svd_lbol_model=None,
                 model = ExactGPModel(torch.from_numpy(param_array_postprocess).float(),
                                      torch.from_numpy(cAmat[i,:]).float(), likelihood)
                 model.load_state_dict(gp)
-    
+
                 # Get into evaluation (predictive posterior) mode
                 model.eval()
                 likelihood.eval()
-    
+
                 f_preds = model(torch.from_numpy(np.atleast_2d(param_list_postprocess)).float())
                 y_preds = likelihood(model(torch.from_numpy(np.atleast_2d(param_list_postprocess)).float()))
                 f_mean = f_preds.mean
                 f_var = f_preds.variance
                 f_covar = f_preds.covariance_matrix
-    
+
                 cAproj[i] = f_mean
                 cAstd[i] = f_var
 
@@ -1423,7 +1424,7 @@ def calc_spectra(tini,tmax,dt,lambdaini,lambdamax,dlambda,param_list,svd_spec_mo
 
     if svd_spec_model == None:
         svd_spec_model = calc_svd_spec(tini,tmax,dt,lambdaini,lambdamax,dlambda,model=model)
- 
+
     spec = np.zeros((len(lambdas),len(tt)))
     for jj,lambda_d in enumerate(lambdas):
         n_coeff = svd_spec_model[lambda_d]["n_coeff"]
@@ -1472,7 +1473,7 @@ def calc_spectra(tini,tmax,dt,lambdaini,lambdamax,dlambda,param_list,svd_spec_mo
             spectra_back[1:-1] = scipy.signal.medfilt(spectra_back,kernel_size=5)[1:-1]
         else:
             spectra_back[1:-1] = scipy.signal.medfilt(spectra_back,kernel_size=5)[1:-1]
-        ii = np.where((spectra_back!=0) & ~np.isnan(spectra_back))[0] 
+        ii = np.where((spectra_back!=0) & ~np.isnan(spectra_back))[0]
         if len(ii) < 2:
             specinterp = np.nan*np.ones(lambdas.shape)
         else:

@@ -14,7 +14,7 @@ from gwemlightcurves.EjectaFits.DiUj2017 import calc_meje, calc_vej
 
 def get_Ka2017_model(table, **kwargs):
 
-    if 'LoadModel' in kwargs: 
+    if 'LoadModel' in kwargs:
         LoadModel = kwargs['LoadModel']
     else:
         LoadModel = False
@@ -55,7 +55,9 @@ def get_Ka2017_model(table, **kwargs):
                 with open(modelfile, 'rb') as handle:
                     svd_mag_model = pickle.load(handle)
             else:
-                svd_mag_model = svd_utils.calc_svd_mag(table['tini'][0], table['tmax'][0], table['dt'][0], model = "Ka2017", n_coeff = table['n_coeff'][0])
+                svd_mag_model = svd_utils.calc_svd_mag(
+                    table['tini'][0], table['tmax'][0], table['dt'][0],
+                    model = "Ka2017", n_coeff = table['n_coeff'][0], **kwargs)
                 if SaveModel:
                     modelfile = os.path.join(ModelPath,'Ka2017_mag.pkl')
                     with open(modelfile, 'wb') as handle:
@@ -68,7 +70,7 @@ def get_Ka2017_model(table, **kwargs):
             if LoadModel:
                 modelfile = os.path.join(ModelPath,'Ka2017_lbol.pkl')
                 with open(modelfile, 'rb') as handle:
-                    svd_lbol_model = pickle.load(handle)            
+                    svd_lbol_model = pickle.load(handle)
             else:
                 svd_lbol_model = svd_utils.calc_svd_lbol(table['tini'][0], table['tmax'][0], table['dt'][0], model = "Ka2017", n_coeff = table['n_coeff'][0])
                 if SaveModel:

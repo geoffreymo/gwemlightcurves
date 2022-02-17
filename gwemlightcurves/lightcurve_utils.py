@@ -118,7 +118,7 @@ def loadEventSpec(filename):
     spec = {}
 
     spec["lambda"] = data_out[:,0] # Angstroms
-    spec["data"] = np.abs(data_out[:,1]) # ergs/s/cm2./Angs 
+    spec["data"] = np.abs(data_out[:,1]) # ergs/s/cm2./Angs
     spec["error"] = np.zeros(spec["data"].shape) # ergs/s/cm2./Angs
     spec["error"][:-1] = np.abs(np.diff(spec["data"]))
     spec["error"][-1] = spec["error"][-2]
@@ -171,12 +171,12 @@ def loadEventPhot(filename):
             else:
                 wavelengths.append(central_filters[filt])
                 mags.append(row[idx]-red)
-                dmags.append(row[idx+1])  
-                limits.append(0)  
+                dmags.append(row[idx+1])
+                limits.append(0)
         if len(wavelengths) < 2: continue
         wavelengths = np.array(wavelengths)
         mags = np.array(mags)
-        dmags = np.array(dmags) 
+        dmags = np.array(dmags)
         limits = np.array(limits)
 
         data[phase] = {}
@@ -295,7 +295,7 @@ def read_posterior_samples_old(filename_samples):
 
     for ii in range(len(params)):
         param = params[ii]
-  
+
         data_out[param] = data[:,ii]
 
     return data_out
@@ -368,6 +368,7 @@ def read_files(files):
         mags[name]["J"] = mag_d[:,7]
         mags[name]["H"] = mag_d[:,8]
         mags[name]["K"] = mag_d[:,9]
+        mags[name]["TESS"] = mag_d[:,10]
 
         names.append(name)
 
@@ -384,7 +385,7 @@ def xcorr_mags(mags1,mags2):
             t1 = mags1[name1]["t"]
             t2 = mags2[name2]["t"]
             t = np.unique(np.append(t1,t2))
-            t = np.arange(-100,100,0.1)      
+            t = np.arange(-100,100,0.1)
 
             mag1 = np.interp(t, t1, mags1[name1]["g"])
             mag2 = np.interp(t, t2, mags2[name2]["g"])
@@ -403,7 +404,7 @@ def xcorr_mags(mags1,mags2):
 
             if len(indexes) == 0:
                 xcorrvals[ii,jj] = 0.0
-                continue           
+                continue
 
             if len(mag1) < len(mag2):
                 mag1vals = (mag1 - np.mean(mag1)) / (np.std(mag1) * len(mag1))
@@ -424,12 +425,12 @@ def xcorr_mags(mags1,mags2):
             elif nslides > 0:
                 chisquares = []
                 for kk in range(np.abs(nslides)):
-                    chisquare = scipy.stats.chisquare(mag1, f_exp=mag2[kk:len(mag1)])[0] 
+                    chisquare = scipy.stats.chisquare(mag1, f_exp=mag2[kk:len(mag1)])[0]
                     chisquares.append(chisquare)
             elif nslides < 0:
                 chisquares = []
                 for kk in range(np.abs(nslides)):
-                    chisquare = scipy.stats.chisquare(mag2, f_exp=mag1[kk:len(mag2)])[0] 
+                    chisquare = scipy.stats.chisquare(mag2, f_exp=mag1[kk:len(mag2)])[0]
                     chisquares.append(chisquare)
 
             xcorrvals[ii,jj] = xcorr_corr
@@ -569,7 +570,7 @@ def get_truths(name,model,n_params,doEjecta):
     return truths
 
 def get_macronovae_rosswog(name):
-    
+
     if name == "SED_wind1":
         params = [0.01, 0.05, 0.3]
     elif name == "SED_wind2":
@@ -592,7 +593,7 @@ def get_macronovae_rosswog(name):
         params = [0.01, 0.1, 0.25]
     elif name == "SED_wind11":
         params = [0.01, 0.25, 0.25]
-    elif name == "SED_wind12": 
+    elif name == "SED_wind12":
         params = [0.01, 0.5, 0.25]
     elif name == "SED_wind13":
         params = [0.1, 0.01, 0.35]
@@ -616,7 +617,9 @@ def get_macronovae_rosswog(name):
         params = [-1,-1,-1]
     return params
 
-def calc_peak_mags(model_table, filts=["u","g","r","i","z","y","J","H","K"], magidxs=[0,1,2,3,4,5,6,7,8]):
+def calc_peak_mags(model_table,
+                   filts=["u","g","r","i","z","y","J","H","K","TESS"],
+                   magidxs=[0,1,2,3,4,5,6,7,8,9]):
     """
     # Peak magnitudes and times in each band"
     """
@@ -646,13 +649,15 @@ def calc_peak_mags(model_table, filts=["u","g","r","i","z","y","J","H","K"], mag
 
     for filt, magidx in zip(filts, magidxs):
         model_table["peak_tt_%s"%filt] = model_table_tts[filt]
-        model_table["peak_mag_%s"%filt] = model_table_mags[filt]        
-        #model_table["peak_appmag_%s"%filt] = model_table_appmags[filt]  
+        model_table["peak_mag_%s"%filt] = model_table_mags[filt]
+        #model_table["peak_appmag_%s"%filt] = model_table_appmags[filt]
 
     return model_table
 
 
-def interpolate_mags_lbol(model_table, filts=["u","g","r","i","z","y","J","H","K"], magidxs=[0,1,2,3,4,5,6,7,8]):
+def interpolate_mags_lbol(model_table,
+                          filts=["u","g","r","i","z","y","J","H","K","TESS"],
+                          magidxs=[0,1,2,3,4,5,6,7,8,9]):
     """
     """
     from scipy.interpolate import interpolate as interp
@@ -738,7 +743,9 @@ def get_mag(mag,key):
         magave = 1.0*mag[7]
     elif key == "K":
         magave = 1.0*mag[8]
-    elif key == "w": 
+    elif key == "TESS":
+        magave = 1.0*mag[9]
+    elif key == "w":
         magave = (mag[1]+mag[2]+mag[3])/3.0
     elif key in ["U","UVW2","UVW1","UVM2"]:
         magave = 1.0*mag[0]
@@ -756,7 +763,8 @@ def get_mag(mag,key):
         magave = 1.0*mag[7]
     return magave
 
-def get_med(magtable, errorbudget = 0.0, filts = ["u","g","r","i","z","y","J","H","K"]):
+def get_med(magtable, errorbudget = 0.0,
+            filts=["u","g","r","i","z","y","J","H","K","TESS"]):
 
     mag_all = {}
     med_all = {}
@@ -783,7 +791,7 @@ def get_med(magtable, errorbudget = 0.0, filts = ["u","g","r","i","z","y","J","H
 
     return med_all
 
-def get_peak(magtable, filts = ["u","g","r","i","z","y","J","H","K"]):
+def get_peak(magtable, filts = ["u","g","r","i","z","y","J","H","K","TESS"]):
 
     peaks_all = {}
     for ii, filt in enumerate(filts):
@@ -792,7 +800,7 @@ def get_peak(magtable, filts = ["u","g","r","i","z","y","J","H","K"]):
             t, lbol, mag = row["t"], row["lbol"], row["mag"]
             maginterp = get_mag(mag,filt)
             if (jj==0):
-                peaks_all[filt] = np.empty((0,2)) 
+                peaks_all[filt] = np.empty((0,2))
 
             idx = np.argmin(maginterp)
             time_min = t[idx]
@@ -808,7 +816,7 @@ def get_envelope(lambdas,spec):
     idx = np.where(np.isfinite(np.log10(spec)))[0]
     lambdas = lambdas[idx]
     spec = spec[idx]
-    
+
     if len(lambdas) == 0:
         return lambdas_all, np.nan*np.zeros(lambdas_all.shape), np.nan*np.zeros(lambdas_all.shape)
 
@@ -836,7 +844,7 @@ def get_envelope(lambdas,spec):
     idx = argrelextrema(spec_lowpass, np.greater)[0]
     idx = np.hstack((0,idx,len(spec_lowpass)-1))
     spec_envelope = spec_lowpass[idx]
-   
+
     try:
         f = interp.interp1d(lambdas[idx], spec_lowpass[idx], fill_value='extrapolate', kind = 'quadratic')
         spec_envelope = f(lambdas)
