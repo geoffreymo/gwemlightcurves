@@ -5,7 +5,7 @@ import optparse
 import numpy as np
 import h5py
 import bisect
-from scipy.interpolate import interpolate as interp
+import scipy.interpolate as interp
 import scipy.signal
 from scipy.signal import savgol_filter
 
@@ -17,7 +17,7 @@ import matplotlib.pyplot as plt
 from matplotlib.pyplot import cm
 
 #import statsmodels.api as sm
-from scipy.ndimage.filters import gaussian_filter
+from scipy.ndimage import gaussian_filter
 
 import sncosmo
 
